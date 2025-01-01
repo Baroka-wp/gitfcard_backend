@@ -11,7 +11,7 @@ module.exports = function(app) {
         );
         next();
     });
-    app.get("/api/product/all", controller.getAll);
+    app.get("/api/products/all", controller.getAll);
 
     app.get(
         "/api/product/:id",

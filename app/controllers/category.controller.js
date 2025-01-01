@@ -11,14 +11,14 @@ exports.create = (req, res) => {
 }
 
 exports.getAll = (req, res) => {
-    const categories = Category.findAll();
-    res.status(200).send(categories);
+    Category.findAll().then((categories) => {
+        res.status(200).send(categories);
+    });
 }
 
 exports.getOne = (req, res) => {
-    Category.findOne({
-        id: req.params.id
-    }).then((category) => {
+    const id = req.params.id;
+    Category.findByPk(id).then((category) => {
         return res.status(200).send(category);
     }).catch(() => {
         return res.status(404).send({message: 'Category not found!'});

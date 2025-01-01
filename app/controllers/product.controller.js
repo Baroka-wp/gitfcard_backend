@@ -4,8 +4,20 @@ const {unlinkSync} = require("node:fs");
 Product = db.product;
 
 exports.create = (req, res) => {
+    console.log('Fichier reçu :', req.file); // Vérifie si le fichier est reçu
+    console.log('Corps de la requête :', req.body); // Vérifie les données textuelles
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'Image file is required' });
+    }
+
     const { name, description, price, stock, categoryId } = req.body;
-    const imagePath = req.file ? req.file.path : null;
+
+    if (!name || !description || !price || !stock || !categoryId) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const imagePath = `/uploads/products/${req.file.filename}`;
     Product.create(
         {
             name,
@@ -24,21 +36,22 @@ exports.create = (req, res) => {
 }
 
 exports.getAll = (req, res) => {
-    const products = Product.findAll();
-    for (let i=0; i<products.length; i++) {
-        products[i].imageUrl = `${req.protocol}://${req.get('host')}/${products[i].image}`;
-    }
-    res.status(200).send(products);
+    Product.findAll().then((products) => {
+        for (let i=0; i<products.length; i++) {
+            products[i].imageUrl = `${req.protocol}://${req.get('host')}/${products[i].image}`;
+        }
+        return res.status(200).send(products);
+    });
 }
 
 exports.getOne = (req, res) => {
-    Product.findOne({
-        id: req.params.id
-    }).then((product) => {
+
+    const { id } = req.params;
+    Product.findByPk(id).then((product) => {
         product.imageUrl = `${req.protocol}://${req.get('host')}/${product.image}`;
         return res.status(200).send(product);
-    }).catch(() => {
-        return res.status(404).send({message: 'Product not found!'});
+    }).catch((err) => {
+        return res.status(500).send({message: err.message});
     })
 }
 

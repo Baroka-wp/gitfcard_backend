@@ -1,18 +1,31 @@
-
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 
-// Définir le dossier de stockage
+// Chemin du dossier de stockage
+const uploadPath = path.join(__dirname, '../../uploads/products');
+
+// Assurez-vous que le dossier de stockage existe
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// Configuration du stockage Multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './uploads/products/'); // Dossier où les images seront stockées
+        // Vérifie et crée dynamiquement le dossier si nécessaire
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath); // Dossier où les images seront stockées
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Nom unique pour chaque fichier
-    }
+        // Génère un nom unique pour le fichier
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
 });
 
-// Filtrer les types de fichiers
+// Filtrage des types de fichiers
 const fileFilter = (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     if (allowedTypes.includes(file.mimetype)) {
@@ -25,8 +38,8 @@ const fileFilter = (req, file, cb) => {
 // Initialiser Multer
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 1024 * 1024 * 5 }, // Limite de 5 MB
-    fileFilter: fileFilter
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5 MB
+    fileFilter: fileFilter,
 });
 
 module.exports = upload;
