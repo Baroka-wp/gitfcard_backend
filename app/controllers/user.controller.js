@@ -1,4 +1,5 @@
 exports.allAccess = (req, res) => {
+    console.log("ok")
     res.status(200).send("Public Content.");
 };
 

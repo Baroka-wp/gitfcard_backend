@@ -25,7 +25,23 @@ db.sequelize = sequelize;
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.product = require("../models/product.model.js")(sequelize, Sequelize);
 db.blacklist = require("../models/blacklist.model.js")(sequelize, Sequelize);
+
+const WishList = require('../models/wishlist.model.js')(sequelize);
+const Wish = require('../models/wish.model')(sequelize);
+const Category = require('../models/category.model')(sequelize);
+const Product = require('../models/product.model.js')(sequelize);
+
+db.wishlist = require('../models/wishlist.model.js')(sequelize);
+db.wish = require('../models/wish.model')(sequelize);
+db.category = require('../models/category.model.js')(sequelize);
+
+db.product.associate({ Category });
+db.category.associate({ Product });
+
+db.wish.associate({ WishList });
+db.wishlist.associate({ Wish });
 
 db.role.belongsToMany(db.user, {
     through: "user_roles"
