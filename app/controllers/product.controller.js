@@ -36,7 +36,9 @@ exports.create = (req, res) => {
 }
 
 exports.getAll = (req, res) => {
-    Product.findAll().then((products) => {
+    Product.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] } // Exclut les timestamps
+    }).then((products) => {
         for (let i=0; i<products.length; i++) {
             products[i].imageUrl = `${req.protocol}://${req.get('host')}/${products[i].image}`;
         }

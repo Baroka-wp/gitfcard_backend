@@ -11,7 +11,9 @@ exports.create = (req, res) => {
 }
 
 exports.getAll = (req, res) => {
-    Category.findAll().then((categories) => {
+    Category.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] } // Exclut les timestamps
+    }).then((categories) => {
         res.status(200).send(categories);
     });
 }
@@ -26,9 +28,8 @@ exports.getOne = (req, res) => {
 }
 
 exports.update = (req, res) => {
-    Category.findOne({
-        id: req.params.id
-    }).then((product) => {
+    const { id } = req.params;
+    Category.findByPk(id).then((product) => {
         product.update(req.body).then((category) => {
             return res.status(201).send(category);
         }).catch((err) => {
